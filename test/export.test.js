@@ -183,3 +183,22 @@ test('export: secrets, dotfiles, databases, research folders and links out of th
   symlinkSync(join(root, 'assets'), join(root, 'assets-link'));
   assert.deepEqual(sourceFiles(root), ['assets-link/logo.svg', 'assets/logo.svg', 'index.html']);
 });
+
+test('export: names are matched case-insensitively, keys inside ordinary files stop the export, link loops end', async () => {
+  const { mkdtempSync, mkdirSync, writeFileSync, symlinkSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { sourceFiles, secretFiles, exportHtml } = await import('../cli/lib/export.js');
+  const { openProject } = await import('../cli/lib/project.js');
+  const root = mkdtempSync(join(tmpdir(), 'om-export-bypass-'));
+  writeFileSync(join(root, 'index.html'), '<!doctype html><title>x</title><div data-composition-id="f" data-width="320" data-height="180"></div>');
+  for (const d of ['Secrets', 'WORK', 'Research']) { mkdirSync(join(root, d)); writeFileSync(join(root, d, 'a.txt'), 'x'); }
+  writeFileSync(join(root, 'SERVER.PEM'), 'x');
+  symlinkSync(root, join(root, 'loop'));                 // a link to the project itself
+  assert.deepEqual(sourceFiles(root), ['index.html']);
+  writeFileSync(join(root, 'config.json'), '{ "openai": "sk-proj-abcdefghijklmnopqrstuvwxyz0123456789" }');
+  writeFileSync(join(root, 'notes.md'), 'deploy key:\n-----BEGIN OPENSSH PRIVATE KEY-----\nabc\n');
+  writeFileSync(join(root, 'copy.txt'), 'Nothing sends itself.');
+  assert.deepEqual(secretFiles(root, sourceFiles(root)).sort(), ['config.json', 'notes.md']);
+  assert.throws(() => exportHtml(openProject(root), { out: mkdtempSync(join(tmpdir(), 'om-export-out-')) + '/share' }), /not exporting[\s\S]*config\.json[\s\S]*notes\.md/);
+});

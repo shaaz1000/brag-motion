@@ -17,22 +17,34 @@ const SKILL = REPO_URL.replace(/^https:\/\/github\.com\//, '');
 // and the working folders a /brag run keeps its research in (real-app screenshots, data extracts).
 const SKIP = new Set(['out', '.om', 'snapshots', 'node_modules', '.git', '.DS_Store', 'work', 'research', '_material', 'secrets', 'credentials']);
 const PRIVATE = /^(\..*|id_rsa.*|id_ed25519.*|.*\.(pem|key|p12|pfx|keystore|db|sqlite|sqlite3)|service-account.*\.json|credentials.*\.json)$/i;
-export const shipped = (rel) => !rel.split(/[\\/]/).some((seg) => SKIP.has(seg) || PRIVATE.test(seg));
+export const shipped = (rel) => !rel.split(/[\\/]/).some((seg) => SKIP.has(seg.toLowerCase()) || PRIVATE.test(seg)); // case-insensitive, as macOS and Windows file systems are
+// Keys and tokens pasted into an ordinary file (config.json, notes.md) are found by content.
+const SECRET_CONTENT = /-----BEGIN [A-Z ]*PRIVATE KEY-----|\b(?:sk-(?:proj-|ant-)?[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9]{30,}|gho_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|xox[abprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{30,})\b/;
+export function secretFiles(root, files) {
+  return files.filter((rel) => {
+    const buf = readFileSync(join(root, rel));
+    if (buf.length > 4 << 20 || buf.subarray(0, 1024).includes(0)) return false; // big or binary: media, fonts
+    return SECRET_CONTENT.test(buf.toString('utf8'));
+  });
+}
 
 export function sourceFiles(root) {
   const files = [];
-  const walk = (dir) => {
+  const rr = realpathSync(root);
+  const walk = (dir, up = []) => {
+    const real = realpathSync(dir);
+    if (up.includes(real)) return; // a link back to a folder above it would walk forever
+    up = [...up, real];
     for (const e of readdirSync(dir, { withFileTypes: true })) {
       const full = join(dir, e.name);
       const rel = relative(root, full).split(sep).join('/');
       if (!shipped(rel)) continue;
       if (e.isSymbolicLink()) { // a link may point anywhere on the machine: ship it only if it stays inside the project
         let target; try { target = realpathSync(full); } catch { continue; }
-        const rr = realpathSync(root);
         if (target !== rr && !target.startsWith(rr + sep)) continue;
       }
       const st = e.isSymbolicLink() ? statSync(full) : e;
-      if (st.isDirectory()) walk(full);
+      if (st.isDirectory()) walk(full, up);
       else if (st.isFile()) files.push(rel);
     }
   };
@@ -118,6 +130,8 @@ export function exportHtml(project, { out, title, description, name, back } = {}
   }
 
   const files = sourceFiles(project.root);
+  const leaks = secretFiles(project.root, files);
+  if (leaks.length) throw new OmError(`not exporting: these files hold what looks like a key or token, and the share page is public:\n  ${leaks.join('\n  ')}\nRemove the secret (or the file) and export again.`);
   const put = (rel, data) => { const f = join(dir, rel); mkdirSync(dirname(f), { recursive: true }); writeFileSync(f, data); };
   const entries = [];
   for (const rel of files) {
