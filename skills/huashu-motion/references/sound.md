@@ -60,7 +60,7 @@ Voice attributes: `inst=` the instrument, `role=melody` (brought forward, a hair
 
 Instruments: `piano` (a concert grand, stereo, with pedal and key-release noise), `strings` (each note played by the section that owns its register), the sections `violins violas celli basses`, a solo `violin`, tremolo `trem`, `lowstr`, `pizz stacc harp horn brass flute dizi erhu guzheng guitar uke rhodes epiano vibes marimba kalimba glock bell glass`, synths `pad warmpad supersaw saw sqlead synpluck pluck chip tri clav`, basses `bass synbass sub808 sinebass`.
 
-Drums: `inst=drums kit=pop|acoustic|808|cinematic`, notes on the General MIDI map — `C,,` kick, `^C,,` rim, `D,,` snare, `^D,,` clap, `^F,,` closed hat, `^A,,` open hat, `A,,` tom, `^C,` crash, `^F,` tambourine, `^A` shaker. The pop and acoustic kits are a recorded kit; 808 and cinematic are synthesized (taiko, big snare). Two drum voices with different kits are fine (an 808 kick under a recorded snare and hats).
+Drums (the score's key signature applies to them too — keep drum voices under `K:C` or write naturals like `=C,,`, or a sharp key turns the kick into a rim): `inst=drums kit=pop|acoustic|808|cinematic`, notes on the General MIDI map — `C,,` kick, `^C,,` rim, `D,,` snare, `^D,,` clap, `^F,,` closed hat, `^A,,` open hat, `A,,` tom, `^C,` crash, `^F,` tambourine, `^A` shaker. The pop and acoustic kits are a recorded kit; 808 and cinematic are synthesized (taiko, big snare). Two drum voices with different kits are fine (an 808 kick under a recorded snare and hats).
 
 ### 3. Compose for the picture
 

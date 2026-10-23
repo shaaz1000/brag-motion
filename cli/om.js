@@ -49,7 +49,7 @@ const HELP = `brag-motion ${VERSION} — launch films made by your coding agent,
   om samples [build [ids…]]      the real-instrument pack (piano, strings, drums…; CC0/CC-BY, ~55 MB): status, or build it once
   om export html [dir] [--out folder] [--title …] [--desc …]   share page (player, Remix prompt, source.zip) for any static host
   om claims [dir] --source <product> [--json] [--strict]   every on-screen string and number, checked against the product's source; flags personal data and secrets
-  om deliver [dir] [--at sec] [--to folder] [--copy "…"]   poster = the strongest settled frame, baked in as frame 0; share copy beside it; --to collects everything in one folder
+  om deliver [dir] [--at sec] [--to folder] [--name n] [--video-only] [--copy "…"]   poster = the strongest settled frame, baked in as frame 0; share copy beside it; --to collects everything in one folder
   om skeleton --length 30|45|60 [--bpm n] [--json]   the film's shape before building: tempo that lands on the length, bars, hook, highlights, burst, drops, end card
   om setup                      install a local FFmpeg + ffprobe (no Homebrew needed) into ~/.huashu-motion/tools
   om doctor                     check Node, FFmpeg and the renderer
@@ -111,6 +111,7 @@ function describe(project, c) {
 async function main() {
   const [cmd = 'help', ...rest] = process.argv.slice(2);
   const { flags, pos } = parse(rest);
+  if (flags.help || flags.h) return out(HELP); // om <command> --help: the overview, never a file named --help
 
   switch (cmd) {
     case 'help': case '--help': case '-h': return out(HELP);
@@ -353,7 +354,7 @@ async function main() {
     }
     case 'deliver': {
       const { deliver } = await import('./lib/deliver.js');
-      const r = deliver(openProject(pos[0] || '.'), { at: flags.at != null && flags.at !== true ? flags.at : null, file: flags.file || null, to: flags.to && flags.to !== true ? flags.to : null, name: flags.name || null, copy: flags.copy && flags.copy !== true ? flags.copy : null, log: (l) => process.stderr.write(l + '\n') });
+      const r = deliver(openProject(pos[0] || '.'), { at: flags.at != null && flags.at !== true ? flags.at : null, file: flags.file || null, to: flags.to && flags.to !== true ? flags.to : null, name: flags.name || null, copy: flags.copy && flags.copy !== true ? flags.copy : null, videoOnly: !!flags['video-only'], log: (l) => process.stderr.write(l + '\n') });
       return out([`video    ${r.video}  (${r.duration.toFixed(2)} s, poster baked in as frame 0)`, `poster   ${r.poster}`, r.share ? `share    ${r.share}` : 'share    none — write share-copy.txt in the project or pass --copy "…"', ...r.collected.map((c) => `copied   ${c}`)].join('\n'));
     }
     case 'skeleton': {

@@ -69,7 +69,7 @@ $OM deliver <dir> [--to folder]        # poster = strongest settled frame, baked
 - **Scenes are timeline labels** `tl.addLabel('scene:intro', 0)`; the studio draws them as the scene strip.
 - **Sound is declared, not placed in an editor.** `OM.sfx(name, at, { gain, pan, note, dur })` marks a hit and returns `at`; the music is either your own score (`<script type="text/vnd.abc" id="om-score">`, its `!mark:name!`s landing on `scene:name` labels) or a built-in direction (`OM.music({ product, drop, ending })`); scene labels are the music's sections. `om sound` turns this into `assets/sound.wav` and `<audio id="om-sound">`; it is regenerated, never hand-edited. Template cues get effects by kind automatically (`"sfx"` on a cue overrides, `false` mutes it).
 - One paused GSAP timeline in `window.__timelines[<composition-id>]`. Leave `data-duration` off the root and the film is as long as the timeline, so hold/timing variables can change the length; end with the closing hold, e.g. `tl.to({}, { duration: V.endHold })`. Set `data-duration` only when the length is fixed by delivery.
-- Everything is a function of time: no `Date.now()`, no unseeded random, no network. Fonts and libraries live in the project (`vendor/`, `assets/`). New projects already have `vendor/om.js` (include it with a script tag to use `OM.*`); a frame-by-frame canvas engine plugs in with `OM.clock(tl, t => draw(t), duration)`. Springs are `ease: OM.spring(0.1)` (closed form, a pure function of time); one camera through one world is `OM.camera('#world')` with `cam.to(tl, at, { fit: '#el', pad, duration })`; randomness is `OM.random(seed)`.
+- Everything is a function of time: no `Date.now()`, no unseeded random, no network. Fonts and libraries live in the project (`vendor/`, `assets/`). New projects already have `vendor/om.js`; the studio, `om still` and `om render` inject the runtime themselves, so `OM.*` works without a script tag (add one only to open the file directly in a browser); a frame-by-frame canvas engine plugs in with `OM.clock(tl, t => draw(t), duration)`. Springs are `ease: OM.spring(0.1)` (closed form, a pure function of time); one camera through one world is `OM.camera('#world')` with `cam.to(tl, at, { fit: '#el', pad, duration })`; randomness is `OM.random(seed)`.
 
 ## Handling a comment
 
@@ -114,7 +114,7 @@ Every film teaches something; `om learn` carries it to the next one. Experience 
 
 这一节让用户及时知道本 skill 有没有新版本。它只读取远程仓库的版本标签，不下载文件、不上传数据、不修改 skill 本身；唯一会写的是本目录的 `.last-update-check`，用来记住上次检查的日期。
 
-使用本 skill 时先读 `.last-update-check`，内容是一行日期加结果，如 `2026-10-13 ok`（只有日期的旧格式按 `ok` 算）。以下情况跳过本节：内容是 `off`（用户关掉了检查）；上次 `ok` 不足 30 天；上次 `failed` 不足 7 天；本目录不是 git 克隆。
+使用本 skill 时先读 `.last-update-check`，内容是一行日期加结果，如 `2026-10-13 ok`（只有日期的旧格式按 `ok` 算）。以下情况跳过本节：内容是 `off`（用户关掉了检查）；上次 `ok` 不足 30 天；上次 `failed` 不足 7 天；本目录不是 git 克隆，或没有 `origin` 远程仓库。
 
 到期时运行 `git -C <本目录> ls-remote --tags --refs --sort=-v:refname origin 'v*'`：
 

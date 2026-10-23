@@ -15,7 +15,7 @@ const SKILL = REPO_URL.replace(/^https:\/\/github\.com\//, '');
 // Tool state and render output stay home: the film copy and the zip carry only what the film needs.
 // A share page is public, so private things never ride along: secrets and keys, dotfiles, databases,
 // and the working folders a /brag run keeps its research in (real-app screenshots, data extracts).
-const SKIP = new Set(['out', '.om', 'snapshots', 'node_modules', '.git', '.DS_Store', 'work', 'research', '_material', 'secrets', 'credentials']);
+const SKIP = new Set(['out', '.om', 'snapshots', 'stills', 'node_modules', '.git', '.DS_Store', 'work', 'research', '_material', 'secrets', 'credentials']);
 const PRIVATE = /^(\..*|id_rsa.*|id_ed25519.*|.*\.(pem|key|p12|pfx|keystore|db|sqlite|sqlite3)|service-account.*\.json|credentials.*\.json)$/i;
 export const shipped = (rel) => !rel.split(/[\\/]/).some((seg) => SKIP.has(seg.toLowerCase()) || PRIVATE.test(seg)); // case-insensitive, as macOS and Windows file systems are
 // Keys and tokens pasted into an ordinary file (config.json, notes.md) are found by content.

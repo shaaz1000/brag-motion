@@ -60,3 +60,18 @@ test('deliver: --at is honoured and checked against the length; no render is a c
   writeFileSync(join(empty, 'index.html'), '<!doctype html>');
   assert.throws(() => deliver(openProject(empty)), /render first/);
 });
+
+test('deliver: text still being typed is not "settled"; --video-only collects just the film', { skip }, () => {
+  // 8 s: a busy still card 1–3 s that changes a little every 0.3 s (typing), then a card that truly holds 5–7 s
+  const dir = mkdtempSync(join(tmpdir(), 'om-deliver-typing-'));
+  writeFileSync(join(dir, 'index.html'), '<!doctype html>');
+  mkdirSync(join(dir, 'out'));
+  const out = join(dir, 'out', 'film.mp4');
+  ff('-f', 'lavfi', '-i', 'testsrc2=size=320x180:rate=30:duration=8', '-f', 'lavfi', '-i', 'testsrc=size=320x180:rate=30:duration=8',
+    '-filter_complex', "[1:v]trim=0:0.04,loop=-1:1:0,setpts=N/30/TB[hold];[0:v][hold]overlay=enable='between(t,1,3)+between(t,5,7)'[a];[a]drawbox=x='mod(floor(t/0.3)*24,300)':y=150:w=20:h=20:color=white:t=fill:enable='between(t,1,3)'[v]",
+    '-map', '[v]', '-t', '8', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', out);
+  const p = pickPoster(out, { from: 0.05, to: 0.95 });
+  assert.ok(p.at >= 5 && p.at <= 7, `picked ${p.at} (typing stretch is 1–3 s)`);
+  const r = deliver(openProject(dir), { to: join(dir, 'videos'), videoOnly: true, copy: 'x' });
+  assert.deepEqual(r.collected.map((f) => f.split('/').pop()), ['film.mp4']);
+});

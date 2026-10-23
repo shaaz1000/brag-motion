@@ -8,7 +8,9 @@ import { OmError } from './project.js';
 
 export async function still(input, { at = null, out = null } = {}) {
   let file = resolve(input || '.');
-  if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html');
+  // a project folder: stills go to <project>/stills/, so they never pile up next to the composition
+  let dirDefault = null;
+  if (existsSync(file) && statSync(file).isDirectory()) { dirDefault = join(file, 'stills'); file = join(file, 'index.html'); }
   if (!existsSync(file)) throw new OmError(`no such page: ${file}`);
   const html = readFileSync(file, 'utf8');
   const root = /data-composition-id[^>]*>/i.exec(html)?.[0] || '';
@@ -20,7 +22,7 @@ export async function still(input, { at = null, out = null } = {}) {
   try { ({ shots } = await capture(file, { times, size: [w, h], lenient: true })); }
   catch (e) { throw e instanceof OmError ? e : new OmError(`screenshot failed: ${e.message}`); }
   const outs = shots.map(({ t, png }) => {
-    const target = resolve(out && times.length === 1 ? out : join(out || dirname(file), `${name}${t == null ? '' : `-${t.toFixed(2)}s`}.png`));
+    const target = resolve(out && times.length === 1 ? out : join(out || dirDefault || dirname(file), `${name}${t == null ? '' : `-${t.toFixed(2)}s`}.png`));
     mkdirSync(dirname(target), { recursive: true });
     writeFileSync(target, png);
     return target;

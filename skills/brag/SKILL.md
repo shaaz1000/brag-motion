@@ -10,6 +10,8 @@ metadata:
 
 You built it. Now brag. One command turns a project into a launch film people want to share. This skill owns the *what* (the angle, the story, the tone, what is true and what is private); the engine skill next to it, **huashu-motion**, owns the *how* (composition, music, render, studio). Read `../huashu-motion/SKILL.md` once per session: its contract and its `om` commands are how you build.
 
+**When the two disagree, this file wins for a /brag run.** The engine's "three directions" step is skipped unless the user asks for options; `brag-plan.md` replaces its `treatment.md`; the studio loop is offered at the end instead of opened first. Everything else in the engine skill (the contract, craft, colour, rhythm and sound rules) applies as written.
+
 ```
 /brag                                   brag about the project in this folder
 /brag https://example.com               brag about a website
@@ -26,9 +28,12 @@ You built it. Now brag. One command turns a project into a launch film people wa
 | `--length` | `30` · `45` · `60` (seconds; any 10–180) | 30 for a launch film, 20 for a feature film |
 | `--voice` | narration with `om voice` (system voice or a recording) | off |
 | `--no-music` / `--no-sfx` | | music and effects on |
-| `--to <folder>` | where finished videos are collected | `brag-output/` only |
+| `--to <folder>` | where finished videos are collected (`om deliver --to … --video-only`) | `brag-output/` only |
+| `--out <folder>` | where the run's files go, e.g. when the project is read-only | `brag-output/` in the project |
 
-Write everything to `brag-output/` in the project (`brag-output-YYYY-MM-DD-HHmmss/` if one exists). The film lives in `brag-output/composition/` (an `om` project).
+Write everything to `brag-output/` in the project (`brag-output-YYYY-MM-DD-HHmmss/` if one exists), or to `--out`. The film lives in `brag-output/composition/` (an `om` project); `om still` on that folder writes into `composition/stills/`.
+
+**Tone and length together.** `--length` sets the structure (`om skeleton`: how many sections, where the burst and the drops are); the tone sets how each section moves — `polished` means few elements, long eases and settled holds *inside* each section and a restrained burst (cuts on the beat, no flashes), not fewer sections. Never stretch a 45 or 60 s film by slowing it down.
 
 ## 0. Tools
 
@@ -68,6 +73,8 @@ Follow huashu-motion's contract and craft rules: one paused GSAP timeline, scene
 
 Then look: `om check` (0 errors), `om still … --at` on every scene **and mid-transition**, fix overflow, collisions, contrast and dead frames. `om sound` for the soundtrack.
 
+Known limits — look at frames, do not trust the tools alone: `om check` can report text that is mid-fade or inside a hidden parent (a child set to `visibility: visible` *stays visible* when its parent is hidden — check for it yourself); `om qa` counts hard cuts by layout change, so a burst that keeps the layout and changes the content shows as few cuts. In an `om-score`, the key signature applies to drum notes too: write drum voices under `K:C` (or use naturals, `=C,,`), or `K:D` turns the kick into a rim.
+
 ## 4. Verify — is it true, is it private, does it move?
 
 ```sh
@@ -83,7 +90,8 @@ om qa brag-output/composition
 ## 5. Deliver
 
 ```sh
-om deliver brag-output/composition --to brag-output        # add --to ~/Downloads/launch-films to collect every video in one place
+om deliver brag-output/composition --to brag-output                          # video, poster, share copy
+om deliver brag-output/composition --to ~/Downloads/launch-films --video-only # one folder that holds only videos
 ```
 
 `om deliver` picks the strongest settled frame as the poster (`--at <sec>` to choose), bakes it in as frame 0 so every platform's thumbnail shows it (length and audio unchanged), and puts the share copy beside the video.

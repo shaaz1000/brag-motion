@@ -41,30 +41,35 @@ function thumbs(file, step, w = 64, h = 36) {
 const meanAbs = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) s += Math.abs(a[i] - b[i]); return s / a.length; };
 const spread = (a) => { let m = 0; for (const x of a) m += x; m /= a.length; let v = 0; for (const x of a) v += (x - m) ** 2; return Math.sqrt(v / a.length); };
 
-// The poster: inside the middle of the film (not the hook still building, not the end card), the
-// frame that has settled the most while still carrying the most picture. Settled = little change
-// from the neighbouring samples; picture = contrast, so a blank or faded frame never wins.
-export function pickPoster(file, { duration, from = 0.25, to = 0.85, step } = {}) {
+// The poster: in the body of the film (not the hook still building, not the end card), the frame that
+// has stayed settled the longest while carrying the most picture. "Settled" is judged over a window of
+// about ±0.4 s, so text being typed or a counter still running never counts as still between two
+// samples. Picture = contrast, so a blank or faded frame never wins. Later frames win ties: the hero
+// moment usually sits after the drop.
+export function pickPoster(file, { duration, from = 0.35, to = 0.9, step, window = 0.4 } = {}) {
   const d = duration ?? probe(file).duration;
   const s = step ?? Math.max(0.1, Math.min(0.25, d / 120));
   const t = thumbs(file, s);
   if (t.length < 3) return { at: d / 2, reason: 'too short to choose — middle frame' };
-  const lo = Math.max(1, Math.floor((from * d) / s)), hi = Math.min(t.length - 2, Math.ceil((to * d) / s));
+  const k = Math.max(1, Math.round(window / s));
+  const lo = Math.max(k, Math.floor((from * d) / s)), hi = Math.min(t.length - 1 - k, Math.ceil((to * d) / s));
+  const step1 = t.map((_, i) => (i ? meanAbs(t[i - 1], t[i]) : 0));
   const contrast = t.map(spread);
   const busy = [...contrast].sort((a, b) => a - b)[Math.floor(contrast.length / 2)]; // median picture
   let best = null;
   for (let i = lo; i <= hi; i++) {
-    const motion = meanAbs(t[i - 1], t[i]) + meanAbs(t[i], t[i + 1]);
     if (contrast[i] < busy * 0.6) continue; // fades, flashes, empty frames
-    const score = motion - contrast[i] * 0.02;
-    if (!best || score < best.score) best = { i, score, motion, contrast: contrast[i] };
+    let motion = 0;
+    for (let j = i - k + 1; j <= i + k; j++) motion += step1[j];
+    const score = motion - contrast[i] * 0.02 - (i / t.length) * 0.05;
+    if (!best || score <= best.score) best = { i, score, motion, contrast: contrast[i] };
   }
   if (!best) return { at: d / 2, reason: 'no settled frame with enough picture — middle frame' };
   // ffmpeg's fps filter centres each sample in its interval
-  return { at: Math.min(d - 0.05, (best.i + 0.5) * s), reason: `settled (motion ${best.motion.toFixed(2)}) with contrast ${best.contrast.toFixed(1)}` };
+  return { at: Math.min(d - 0.05, (best.i + 0.5) * s), reason: `settled for ±${window}s (motion ${best.motion.toFixed(2)}) with contrast ${best.contrast.toFixed(1)}` };
 }
 
-export function deliver(project, { at = null, file = null, to = null, name = null, copy = null, log = () => {} } = {}) {
+export function deliver(project, { at = null, file = null, to = null, name = null, copy = null, videoOnly = false, log = () => {} } = {}) {
   const video = file ? resolve(file) : latestRender(project.root);
   if (!video || !existsSync(video)) throw new OmError(`nothing to deliver — render first (om render ${project.root})`);
   const info = probe(video);
@@ -100,7 +105,7 @@ export function deliver(project, { at = null, file = null, to = null, name = nul
   if (to) {
     const dest = resolve(to);
     mkdirSync(dest, { recursive: true });
-    collected = files.map((f) => { const d = join(dest, basename(f)); copyFileSync(f, d); return d; });
+    collected = (videoOnly ? [final] : files).map((f) => { const d = join(dest, basename(f)); copyFileSync(f, d); return d; });
   }
   return { video: final, poster, share: text ? share : null, at: pick.at, reason: pick.reason, duration: info.duration, collected };
 }

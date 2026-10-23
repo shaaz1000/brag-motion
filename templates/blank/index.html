@@ -1,26 +1,27 @@
 <!doctype html>
-<html lang="zh-CN" data-composition-variables='[
-  {"id":"kicker","type":"string","label":"眉题","default":"HUASHU-MOTION"},
-  {"id":"title","type":"string","label":"标题","default":"一句话，变成会动的画面"},
-  {"id":"subtitle","type":"string","label":"副标题","default":"对着画面指一下，就能改"},
-  {"id":"stat","type":"number","label":"数字","default":100,"min":0,"max":9999,"step":1},
-  {"id":"statLabel","type":"string","label":"数字说明","default":"% 由代码生成，随时可改"},
-  {"id":"accent","type":"color","label":"强调色","default":"#d9480f"},
-  {"id":"paper","type":"color","label":"底色","default":"#f3eee4"},
-  {"id":"ink","type":"color","label":"文字色","default":"#1d1b18"},
-  {"id":"endHold","type":"number","label":"结尾停留（秒）","default":1.6,"min":0,"max":10,"step":0.1,"group":"节奏"}
+<html lang="en" data-composition-variables='[
+  {"id":"kicker","type":"string","label":"Kicker","default":"BRAG-MOTION"},
+  {"id":"title","type":"string","label":"Title","default":"You built it. Now brag."},
+  {"id":"subtitle","type":"string","label":"Subtitle","default":"Point at the frame to change it"},
+  {"id":"stat","type":"number","label":"Number","default":100,"min":0,"max":9999,"step":1},
+  {"id":"statLabel","type":"string","label":"Number caption","default":"% made of code, editable any time"},
+  {"id":"accent","type":"color","label":"Accent","default":"#b23a0b"},
+  {"id":"paper","type":"color","label":"Paper","default":"#f3eee4"},
+  {"id":"ink","type":"color","label":"Ink","default":"#1d1b18"},
+  {"id":"endHold","type":"number","label":"End hold (s)","default":1.6,"min":0,"max":10,"step":0.1,"group":"Timing"}
 ]'>
 <head>
 <meta charset="utf-8">
-<title>huashu-motion · blank</title>
+<title>brag-motion · blank</title>
 <script src="vendor/gsap.min.js"></script>
 <style id="om-fonts">
+@font-face { font-family: "Inter"; src: url("assets/fonts/Inter-var.woff") format("woff"); font-weight: 100 900; font-style: normal; }
 @font-face { font-family: "Noto Sans SC"; src: url("assets/fonts/NotoSansSC-500.woff") format("woff"); font-weight: 500; font-style: normal; }
 @font-face { font-family: "Noto Sans SC"; src: url("assets/fonts/NotoSansSC-900.woff") format("woff"); font-weight: 900; font-style: normal; }
 </style>
 <style>
   html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
-  #film { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--paper); color: var(--ink); font-family: "Noto Sans SC", sans-serif; font-weight: 500; }
+  #film { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--paper); color: var(--ink); font-family: "Inter", "Noto Sans SC", sans-serif; font-weight: 500; }
   .grain { position: absolute; inset: 0; opacity: .5; background:
       radial-gradient(1200px 700px at 20% 10%, #ffffff80, transparent 60%),
       radial-gradient(900px 600px at 90% 100%, #00000010, transparent 60%); }
@@ -29,7 +30,7 @@
   .title .ch { display: inline-block; }
   .title .mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 10px; }
   .rule { position: absolute; left: 160px; top: 528px; width: 1100px; height: 10px; background: var(--accent); transform-origin: 0 50%; }
-  .subtitle { position: absolute; left: 160px; top: 580px; font-size: 44px; opacity: .72; }
+  .subtitle { position: absolute; left: 160px; top: 580px; font-size: 44px; opacity: .8; }
   .stat { position: absolute; left: 160px; top: 300px; display: flex; align-items: baseline; gap: 36px; }
   .stat .num { font-size: 360px; line-height: 1; letter-spacing: -14px; font-weight: 900; color: var(--accent); font-variant-numeric: tabular-nums; }
   .stat .lbl { font-size: 64px; }
@@ -50,18 +51,18 @@
   <div class="grain"></div>
 
   <section id="s-title">
-    <div class="kicker" data-om-id="kicker" data-var-text="kicker">HUASHU-MOTION</div>
+    <div class="kicker" data-om-id="kicker" data-var-text="kicker">BRAG-MOTION</div>
     <h1 class="title" data-om-id="title" data-om-var="title"></h1>
     <div class="rule" data-om-id="rule"></div>
-    <div class="subtitle" data-om-id="subtitle" data-var-text="subtitle">对着画面指一下，就能改</div>
+    <div class="subtitle" data-om-id="subtitle" data-var-text="subtitle">Point at the frame to change it</div>
   </section>
 
   <section id="s-stat" class="stat" data-om-id="stat">
     <span class="num" id="num">0</span>
-    <span class="lbl" data-var-text="statLabel">% 由代码生成，随时可改</span>
+    <span class="lbl" data-var-text="statLabel">% made of code, editable any time</span>
   </section>
 
-  <section id="s-end" class="end" data-om-id="end"><span>made with <b>huashu-motion</b></span></section>
+  <section id="s-end" class="end" data-om-id="end"><span>made with <b>brag-motion</b></span></section>
 </div>
 
 <script>
