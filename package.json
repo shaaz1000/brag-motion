@@ -1,0 +1,50 @@
+{
+  "name": "brag-motion",
+  "version": "0.2.0",
+  "description": "You built it. Now brag. Your coding agent turns the project into a launch video with real UI and its own composed soundtrack, checks every claim against your code, and lets you point at any frame to change it.",
+  "type": "module",
+  "bin": {
+    "om": "cli/om.js",
+    "brag-motion": "cli/om.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "cli",
+    "studio",
+    "runtime",
+    "templates",
+    "fonts",
+    "examples",
+    "skills",
+    "LICENSE",
+    "THIRD_PARTY.md",
+    "CREDITS.md"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "launch-video",
+    "brag",
+    "motion-graphics",
+    "agent-skill",
+    "claude-code",
+    "codex",
+    "video",
+    "gsap"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaaz1000/brag-motion.git"
+  },
+  "homepage": "https://github.com/shaaz1000/brag-motion#readme",
+  "bugs": "https://github.com/shaaz1000/brag-motion/issues",
+  "author": "Shaaz Khan (https://github.com/shaaz1000)",
+  "license": "MIT",
+  "contributors": [
+    "Huashu / 花叔 (https://github.com/alchaincyf) — huashu-motion",
+    "Shunit Haviv Hakimi / latent-spaces (https://github.com/latent-spaces) — /brag"
+  ]
+}

@@ -1,0 +1,25 @@
+#!/bin/sh
+# Runs the CLI shipped next to this skill (falls back to the npm package).
+# om needs Node 22+. When the shell's node is older, use the newest 22+ from nvm, fnm or Volta
+# instead of failing — a machine often has a new Node installed but not selected.
+DIR="$(cd "$(dirname "$0")" && pwd -P)"
+
+node_major() { "$1" -e 'process.stdout.write(process.versions.node.split(".")[0])' 2>/dev/null || echo 0; }
+
+NODE="$(command -v node 2>/dev/null)"
+if [ -z "$NODE" ] || [ "$(node_major "$NODE")" -lt 22 ]; then
+  BEST=""; BEST_MAJOR=0
+  for n in "$HOME"/.nvm/versions/node/v*/bin/node "$HOME"/.local/share/fnm/node-versions/v*/installation/bin/node "$HOME"/.volta/tools/image/node/*/bin/node /opt/homebrew/bin/node /usr/local/bin/node; do
+    [ -x "$n" ] || continue
+    m="$(node_major "$n")"
+    if [ "$m" -ge 22 ] && [ "$m" -gt "$BEST_MAJOR" ]; then BEST="$n"; BEST_MAJOR="$m"; fi
+  done
+  if [ -n "$BEST" ]; then NODE="$BEST"
+  else
+    echo "om: needs Node 22 or newer (found $( [ -n "$NODE" ] && "$NODE" -v || echo none )). Install it: https://nodejs.org or 'nvm install 24'" >&2
+    exit 1
+  fi
+fi
+
+if [ -f "$DIR/../../../cli/om.js" ]; then exec "$NODE" "$DIR/../../../cli/om.js" "$@"; fi
+exec npx --yes github:shaaz1000/brag-motion "$@"

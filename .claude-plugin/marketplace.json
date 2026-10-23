@@ -1,0 +1,8 @@
+{
+  "name": "brag-motion",
+  "description": "You built it. Now brag. Launch videos from your project, made by your coding agent — real UI, a composed soundtrack, every claim checked, point at the frame to change it.",
+  "owner": { "name": "Shaaz Khan", "url": "https://github.com/shaaz1000" },
+  "plugins": [
+    { "name": "brag-motion", "source": "./", "description": "/brag workflow + the huashu-motion engine: launch and feature videos from the project you built." }
+  ]
+}
