@@ -22,6 +22,17 @@ brag-motion joins two open-source projects and adds what was missing between the
 
 ---
 
+## Before → after
+
+What you give it is the product you already have. What you get is a film made from it — the same screens, colours, type and data, rebuilt and set to its own score.
+
+| Before: the product | After: the film brag-motion made from it |
+|---|---|
+| <img src="docs/media/before-noor.jpg" alt="Noor's two main screens: the dhikr counter and today's prayer times" width="100%" /><br/>**Noor** — the app's dhikr counter and prayer-times screens | <img src="docs/media/noor-30s.gif" alt="Noor film: the prayer times race through six skies and curl into the dhikr ring" width="100%" /><br/>`/brag --length 30` — [full film](https://github.com/shaaz1000/brag-motion/releases/latest) |
+| <img src="docs/media/before-novic.jpg" alt="Novic's patient file for a demo patient: 12 visits, ₹5,400 spent" width="100%" /><br/>**Novic** — a patient's file in the running app (demo data) | <img src="docs/media/novic-45s.gif" alt="Novic film: Approve & send, the prescription on WhatsApp, the reminder three days before" width="100%" /><br/>`/brag --length 45` — [full film](https://github.com/shaaz1000/brag-motion/releases/latest) |
+
+---
+
 ## Examples: 30 s, 45 s, 1 minute
 
 All three were made with brag-motion, from the apps' own code and demo data. Full-quality MP4s with sound (16:9 and 9:16) are on the [release page](https://github.com/shaaz1000/brag-motion/releases/latest).
@@ -36,15 +47,15 @@ All three were made with brag-motion, from the apps' own code and demo data. Ful
 
 <img src="docs/media/novic-45s.gif" alt="Novic 45-second film: the patient's own intake, today's queue, the consultation, Approve & send, history and the follow-up reminder" width="100%" />
 
-`/brag --length 45 --tone polished` · 112 BPM, 21 bars, two drops. The front desk, the doctor and the follow-up — without anyone retyping anything. Every name, number and message is the app's real demo data and template wording, checked with `om claims`.
+`/brag --length 45 --tone polished` · 112 BPM, 21 bars, two drops. A patient checks herself in on her own phone, one question per screen; her answers are in the clinic's queue and on the doctor's screen before she sits down. On the beat, ten real visits from her file flick past; the doctor writes one line, and on the big drop presses Approve & send — nothing reaches a patient before that. Three days before her next visit the reminder goes out (with the raw date, exactly as the app sends it), one tap books her. Every name, number and message is the app's demo data and template wording, checked with `om claims`.
 
 ### 1 minute — A day at Sunrise Family Clinic
 
 <img src="docs/media/novic-60s.gif" alt="Novic 60-second film: a whole clinic day from the morning dashboard to the evening reports" width="100%" />
 
-`/brag --length 60` · 120 BPM, 30 bars. Morning dashboard → online booking → queue → consultation and Approve & send → WhatsApp → payment → follow-up → the evening's reports, with a montage burst through everything else the product does.
+`/brag --length 60` · 120 BPM, 30 bars. One demo patient through one clinic day: the 07:45 dashboard, booking online at 07:52, one tap at the front desk, the doctor reading his history before she types, Approve & send, the prescription on WhatsApp — then a 13-cut montage on the beat through the waitlist, team roles and eight practice types — the payment recorded at the desk, the follow-up reminder, and on a key-change drop, the evening heatmap of when the clinic was busiest.
 
-Also on the release page: seven 20-second **feature films** for Novic (patient history, dashboard, payments, follow-ups, templates, online booking, team roles) in 16:9 and 9:16, and Noor in three directions.
+Also on the release page: 20-second **feature films** for Novic (patient history, dashboard and reports, follow-ups, templates, online booking, team roles) in 16:9 and 9:16, and Noor in three directions (one line, five skies, thirty-three beads).
 
 ---
 
@@ -222,7 +233,7 @@ Engine details — the composition contract, director, colour, rhythm and sound 
 npm test     # the engine's suite plus claims, deliver, skeleton and tools
 ```
 
-The render tests drive a real Chrome and take a few minutes; the new commands' tests take seconds:
+The render tests drive a real Chrome and take a few minutes; `node --test` runs files in parallel, so on a loaded machine a timing test or a Chrome timeout can fail — rerun with `node --test --test-concurrency=1 test/*.test.js`. The new commands' tests take seconds:
 `node --test test/claims.test.js test/deliver.test.js test/skeleton.test.js test/tools.test.js`.
 
 ## Credits & license

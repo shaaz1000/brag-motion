@@ -6,6 +6,7 @@
 // personal data and secrets (the /brag rule: nothing private goes into a public video).
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, relative, resolve } from 'node:path';
+import { createRequire } from 'node:module';
 import { readVariables } from './project.js';
 
 const SKIP_DIRS = new Set(['node_modules', '.git', '.hg', 'dist', 'build', '.next', '.nuxt', 'out', 'coverage', '.om', 'vendor', '.cache', '.turbo', '.vercel', '__pycache__', '.venv', 'venv', 'secrets', 'credentials', 'brag-output']);
@@ -36,6 +37,15 @@ function looksLikeCode(s) {
   return false;
 }
 
+// Pieces of code, not prose: string concatenation ends, inline CSS, expressions.
+function looksLikeFragment(s) {
+  const t = s.trim();
+  if (/^[,+:;)\]}]|[,+(:=\[{]$/.test(t)) return true;           // ', ppl: ' · 'x(' · '+ y'
+  if (/!=|==|=>|&&|\|\||\?\s*$|\bnull\b|\bundefined\b/.test(t)) return true;
+  if (/^[\w-]+\s*:\s*[^\s].*?;?$/.test(t) && /:\s*[\d#.-]/.test(t) && !/\s\w+\s\w+/.test(t)) return true; // top:176px; color: #fff
+  return false;
+}
+
 // Every piece of on-screen text: element text, string variables, and the string literals the
 // timeline types or builds (typed answers, chat bubbles, labels made in a loop).
 export function onScreenText(html) {
@@ -59,6 +69,9 @@ export function onScreenText(html) {
     const stripped = code.replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, ' ');
     for (const m of stripped.matchAll(/'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`((?:[^`\\$]|\\.)*)`/g)) {
       const s = (m[1] ?? m[2] ?? m[3] ?? '').replace(/\\n/g, ' ').replace(/\\(.)/g, '$1');
+      const before = stripped.slice(Math.max(0, m.index - 40), m.index);
+      if (/(class(Name|List)?|\.(add|remove|toggle|contains)\(|setAttribute\(\s*['"]class['"]\s*,|querySelector(All)?\(|getElementById\(|\$\(|gsap\.\w+\(|tl\.\w+\(|style\.\w+\s*=|cssText\s*=)\s*[=:(,+]?\s*$/.test(before)) continue; // class names, selectors, styles
+      if (looksLikeFragment(s)) continue;
       if (/<[a-z][^>]*>/i.test(s)) { for (const t of s.matchAll(/>([^<]+)</g)) add(t[1], 'script'); continue; } // HTML built in a string
       if (/\s/.test(s.trim()) || /[₹$€£%°]|\d{2,}/.test(s)) add(s, 'script');
     }
@@ -88,6 +101,7 @@ export function indexSource(root, { maxBytes = 2 << 20, maxFiles = 20000 } = {})
       if (files.length >= maxFiles) return;
       const p = join(dir, e.name);
       if (e.isDirectory()) { if (!SKIP_DIRS.has(e.name) && !e.name.startsWith('.git')) walk(p); continue; }
+      if (e.isFile() && /\.(db|sqlite|sqlite3)$/i.test(e.name) && !SECRET_FILE.test(e.name)) { files.push(...readDatabase(p, root)); continue; }
       if (!e.isFile() || SECRET_FILE.test(e.name) || BINARY_EXT.has(extname(e.name).toLowerCase())) continue;
       let st; try { st = statSync(p); } catch { continue; }
       if (st.size > maxBytes || st.size === 0) continue;
@@ -99,6 +113,29 @@ export function indexSource(root, { maxBytes = 2 << 20, maxFiles = 20000 } = {})
   };
   walk(resolve(root));
   return files;
+}
+
+// Demo data is real material: names, dates and amounts on screen often come from the product's
+// database, not its code. Every text and number cell of every table, read-only, one entry per table.
+function readDatabase(path, root, { maxRows = 50000 } = {}) {
+  let db;
+  try { db = new (requireSqlite())(path, { readOnly: true }); } catch { return []; }
+  const out = [];
+  try {
+    for (const { name } of db.prepare("select name from sqlite_master where type = 'table' and name not like 'sqlite_%'").all()) {
+      const cells = [];
+      for (const row of db.prepare(`select * from "${name.replace(/"/g, '""')}" limit ${maxRows}`).all()) {
+        for (const v of Object.values(row)) if (typeof v === 'string' || typeof v === 'number') cells.push(String(v));
+      }
+      if (cells.length) { const text = cells.join('\n'); out.push({ path: `${relative(root, path)}#${name}`, text: norm(text), digits: text.replace(/(\d),(?=\d)/g, '$1') }); }
+    }
+  } catch { /* an unreadable table is no evidence */ } finally { try { db.close(); } catch {} }
+  return out;
+}
+let sqliteCtor = null;
+function requireSqlite() {
+  if (!sqliteCtor) sqliteCtor = createRequire(import.meta.url)('node:sqlite').DatabaseSync;
+  return sqliteCtor;
 }
 
 const PRIVACY = [

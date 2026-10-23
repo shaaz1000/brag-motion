@@ -87,3 +87,30 @@ test('claims: the report says what is unverified and what is private, and works 
   assert.equal(bare.checked, false);
   assert.match(report(bare), /add --source/);
 });
+
+test('claims: class names, selectors, inline CSS and code fragments in scripts are not claims', () => {
+  const html = `<div></div><script>
+    row.className = 'qpill wait'; el.classList.add('step done'); $('#q .row live');
+    el.style.cssText = 'top:176px; left: 20px'; const s = 'top:176px';
+    const label = name + ', ppl: ' + n; const x = (t.ch != null ? a : b);
+    const msg = 'Booked. We will see you then.';
+  </script>`;
+  assert.deepEqual(onScreenText(html).map((x) => x.text), ['Booked. We will see you then.']);
+});
+
+test('claims: a SQLite database in the source is evidence (read-only); names and numbers stored there are found', async () => {
+  const { DatabaseSync } = await import('node:sqlite');
+  const dir = mkdtempSync(join(tmpdir(), 'om-claims-db-'));
+  const film = join(dir, 'film'); mkdirSync(film);
+  writeFileSync(join(film, 'index.html'), '<div>Chitra Silva · 12 visits · ₹5,400 spent</div><div>Ira Mehta</div>');
+  const src = join(dir, 'product'); mkdirSync(join(src, 'data'), { recursive: true });
+  const db = new DatabaseSync(join(src, 'data', 'clinic.db'));
+  db.exec("create table patients (id integer, name text); insert into patients values (1, 'Chitra Silva'); create table payments (amount integer); insert into payments values (5400)");
+  db.close();
+  const r = claims(openProject(film), { source: src });
+  const by = Object.fromEntries(r.strings.map((s) => [s.text, s]));
+  assert.equal(by['Ira Mehta'].found, null);
+  const line = by['Chitra Silva · 12 visits · ₹5,400 spent'];
+  assert.deepEqual(line.numbers.find((n) => n.raw === '₹5,400').found, join('data', 'clinic.db') + '#payments');
+  assert.ok(indexSource(src).some((f) => f.path === join('data', 'clinic.db') + '#patients' && f.text.includes('chitra silva')));
+});

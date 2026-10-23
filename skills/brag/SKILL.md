@@ -55,7 +55,7 @@ Commit to one angle. Write `brag-output/brag-plan.md`:
 
 - the 9 rubric answers, the tone (preset + direction), the format;
 - **hook (first 2 s)**, reveal, 2–3 highlights, punchline/outro — and which real UI each one shows;
-- the rhythm sheet. Start from `om skeleton --length <30|45|60>`: it picks the tempo whose whole bars land exactly on the length (30 s and 60 s at 120 BPM, 45 s at 112) and lays out hook, highlights, burst, the small drop (films over 40 s), the stop, the big drop and the held end card. Fill each scene with real material; move a boundary only by whole bars. Details: [../huashu-motion/references/rhythm.md](../huashu-motion/references/rhythm.md);
+- the rhythm sheet. Start from `om skeleton --length <30|45|60>`: it picks the tempo whose whole bars land exactly on the length (30 s and 60 s at 120 BPM, 45 s at 112) and lays out hook, highlights, burst, the small drop (films over 40 s), the stop, the big drop and the held end card. Fill each scene with real material; move a boundary only by whole bars. A story with more beats than the skeleton has sections is fine: put several scene labels inside one section (`scene:dashboard`, `scene:booking` inside highlight-1), each on a beat, and keep the section boundaries on their bars. Details: [../huashu-motion/references/rhythm.md](../huashu-motion/references/rhythm.md);
 - the palette with sources, the type, the logo file;
 - a "what is real" list: for every number and quoted string, where it comes from (file, page, table). Anything that is a film device (an animated transition the app does not have, an illustrative timestamp) is listed as such.
 
@@ -71,7 +71,7 @@ om new brag-output/composition          # or --template <id> when a grammar fits
 
 Follow huashu-motion's contract and craft rules: one paused GSAP timeline, scene labels on the beat, editable values as variables, `data-om-id` on everything a person might point at, the real UI rebuilt in HTML/CSS with the brand's own tokens and fonts, a composed `om-score` (or `--no-music`), `OM.sfx` on every landing. Build the hook and the key moment first, at full size.
 
-Then look: `om check` (0 errors), `om still … --at` on every scene **and mid-transition**, fix overflow, collisions, contrast and dead frames. `om sound` for the soundtrack.
+Run `om sound` once as soon as the score exists (the composition references `assets/sound.wav`, and `om check` reports it missing until then). Then look: `om check` (0 errors), `om still … --at` on every scene **and mid-transition**, fix overflow, collisions, contrast and dead frames. Re-run `om sound` after any timing change.
 
 Known limits — look at frames, do not trust the tools alone: `om check` can report text that is mid-fade or inside a hidden parent (a child set to `visibility: visible` *stays visible* when its parent is hidden — check for it yourself); `om qa` counts hard cuts by layout change, so a burst that keeps the layout and changes the content shows as few cuts. In an `om-score`, the key signature applies to drum notes too: write drum voices under `K:C` (or use naturals, `=C,,`), or `K:D` turns the kick into a rim.
 
@@ -83,7 +83,7 @@ om render brag-output/composition --blur
 om qa brag-output/composition
 ```
 
-- `om claims` lists what it could not find in the source. Captions are yours and will show as not found; everything else needs an answer: reworded real copy (fine), a number from a database (say so in the plan), or an invention (remove it). **Any privacy finding is a stop** — replace it before delivering.
+- `om claims` lists what it could not find in the source (code, text files, and any SQLite database under `--source`, opened read-only — demo data counts as evidence; formatted dates and strings built from templates will still show as not found). Captions are yours and will show as not found; everything else needs an answer: reworded real copy (fine), a number from a database (say so in the plan), or an invention (remove it). **Any privacy finding is a stop** — replace it before delivering.
 - A film that shows the product doing something it does not do is the worst bug a launch film can have (a confirmation message nothing sends, a button that does not exist). Check behaviour in the code, not only words.
 - `om qa`: no single-frame pops; dead time only on reading holds and the end card.
 
