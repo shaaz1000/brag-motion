@@ -1,12 +1,21 @@
 {
   "name": "brag-motion",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Turn the project you built into a launch video: real UI, a composed soundtrack, claims checked against your code, a poster and share copy — then point at any frame to change it.",
-  "author": { "name": "Shaaz Khan", "url": "https://github.com/shaaz1000" },
+  "author": {
+    "name": "Shaaz Khan",
+    "url": "https://github.com/shaaz1000"
+  },
   "homepage": "https://github.com/shaaz1000/brag-motion",
   "repository": "https://github.com/shaaz1000/brag-motion",
   "license": "MIT",
-  "keywords": ["video", "launch", "brag", "motion-graphics", "skill"],
+  "keywords": [
+    "video",
+    "launch",
+    "brag",
+    "motion-graphics",
+    "skill"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "brag-motion",
@@ -14,8 +23,16 @@
     "longDescription": "Reads your project, plans a short launch or feature video in the right tone, rebuilds your real UI, composes its own soundtrack, checks every on-screen claim against your code, and delivers the video with a poster and share copy. Then open the studio and point at any frame to change it.",
     "developerName": "Shaaz Khan",
     "category": "Productivity",
-    "capabilities": ["Read", "Write", "Execute"],
+    "capabilities": [
+      "Read",
+      "Write",
+      "Execute"
+    ],
     "websiteURL": "https://github.com/shaaz1000/brag-motion",
-    "defaultPrompt": ["Let's brag about this project.", "Make a 20-second launch video for what I built.", "Make a short video for each feature of this app."]
+    "defaultPrompt": [
+      "Let's brag about this project.",
+      "Make a 20-second launch video for what I built.",
+      "Make a short video for each feature of this app."
+    ]
   }
 }

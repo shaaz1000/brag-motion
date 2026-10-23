@@ -1,10 +1,19 @@
 {
   "name": "brag-motion",
   "description": "Turn the project you built into a launch video: real UI, a composed soundtrack, claims checked against your code, a poster and share copy — then point at any frame to change it.",
-  "version": "0.2.0",
-  "author": { "name": "Shaaz Khan", "url": "https://github.com/shaaz1000" },
+  "version": "0.2.1",
+  "author": {
+    "name": "Shaaz Khan",
+    "url": "https://github.com/shaaz1000"
+  },
   "license": "MIT",
   "homepage": "https://github.com/shaaz1000/brag-motion",
   "repository": "https://github.com/shaaz1000/brag-motion",
-  "keywords": ["video", "launch", "brag", "motion-graphics", "skill"]
+  "keywords": [
+    "video",
+    "launch",
+    "brag",
+    "motion-graphics",
+    "skill"
+  ]
 }

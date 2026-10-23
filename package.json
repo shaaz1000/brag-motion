@@ -1,6 +1,6 @@
 {
   "name": "brag-motion",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "You built it. Now brag. Your coding agent turns the project into a launch video with real UI and its own composed soundtrack, checks every claim against your code, and lets you point at any frame to change it.",
   "type": "module",
   "bin": {

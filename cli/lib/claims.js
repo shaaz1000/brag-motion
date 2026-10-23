@@ -236,8 +236,8 @@ export function report(r) {
     }
   }
   if (r.privacy.length) {
-    lines.push('', 'Personal data or secrets in the film'\''s files — a public film must not carry them (use fictional stand-ins):');
+    lines.push('', 'Personal data or secrets in the film’s files — a public film must not carry them (use fictional stand-ins):');
     for (const p of r.privacy) lines.push(`  ! ${p.kind}: ${p.value}   in "${p.in}"`);
-  } else lines.push('', 'privacy  no emails, phone numbers, keys or internal addresses anywhere in the film'\''s files');
+  } else lines.push('', 'privacy  no emails, phone numbers, keys or internal addresses anywhere in the film’s files');
   return lines.join('\n');
 }

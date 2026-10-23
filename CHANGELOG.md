@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- **Privacy:** `om claims` checks every text file of the film for emails, phone numbers, keys and internal addresses — not only the strings it keeps as on-screen text. Before, a secret in a JSON variable, a data attribute, a class-name position, a long minified line or `share-copy.txt` could slip past. Findings name their file and line.
+
 ## 0.2.0 — brag-motion
 
 The first release of brag-motion: /brag's workflow on the huashu-motion engine.
