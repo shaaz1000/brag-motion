@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- **Privacy:** `om claims` never repeats a secret it found. Keys, emails and phone numbers are masked (`sk-p…56 (40 chars)`, `p***@example.com`, `+••••••••••22`) in the privacy findings *and* wherever they appear inside the listed on-screen strings, in both the text report and `--json`. The file and line still say where to look.
+
 ## 0.2.1
 
 - **Privacy:** `om claims` checks every text file of the film for emails, phone numbers, keys and internal addresses — not only the strings it keeps as on-screen text. Before, a secret in a JSON variable, a data attribute, a class-name position, a long minified line or `share-copy.txt` could slip past. Findings name their file and line.

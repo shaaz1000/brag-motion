@@ -1,7 +1,7 @@
 {
   "name": "brag-motion",
   "description": "Turn the project you built into a launch video: real UI, a composed soundtrack, claims checked against your code, a poster and share copy — then point at any frame to change it.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": {
     "name": "Shaaz Khan",
     "url": "https://github.com/shaaz1000"

@@ -6,7 +6,7 @@ metadata:
   homepage: "https://github.com/alchaincyf"
   repository: "https://github.com/shaaz1000/brag-motion"
   upstream: "https://github.com/alchaincyf/huashu-motion"
-  version: "0.2.1"
+  version: "0.2.2"
 ---
 
 # huashu-motion

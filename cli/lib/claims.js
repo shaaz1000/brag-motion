@@ -145,6 +145,25 @@ const PRIVACY = [
   ['internal address', /\b(?:https?:\/\/)?(?:localhost|127\.0\.0\.1|0\.0\.0\.0|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}|[\w-]+\.(?:internal|local|corp|lan))(?::\d{2,5})?\b/gi],
 ];
 
+// A finding is reported masked: the report goes to terminals, agent transcripts and --json logs,
+// so it must not repeat the secret it found. Enough is kept to recognise it; the file and line say where.
+export function mask(kind, v) {
+  if (kind === 'email address') { const [u, d] = v.split('@'); return `${u.slice(0, 1)}***@${d}`; }
+  if (kind === 'phone number') { const digits = v.replace(/\D/g, ''); return `${v.trim().startsWith('+') ? '+' : ''}${'•'.repeat(Math.max(0, digits.length - 2))}${digits.slice(-2)}`; }
+  if (kind === 'API key or token') return `${v.slice(0, 4)}…${v.slice(-2)} (${v.length} chars)`;
+  return v; // internal addresses are not secrets in themselves; showing them is what makes them fixable
+}
+
+// Masks every personal value inside a string, for output only (matching uses the original text).
+export function redact(text) {
+  let out = text;
+  for (const [kind, re] of PRIVACY) {
+    if (kind === 'internal address') continue;
+    out = out.replace(re, (m) => (kind === 'phone number' && (m.replace(/\D/g, '').length < 10 || /^\d{4}-\d{2}-\d{2}/.test(m.trim())) ? m : mask(kind, m.trim())));
+  }
+  return out;
+}
+
 export function privacyScan(strings) {
   const hits = [];
   for (const { text } of strings) {
@@ -153,7 +172,7 @@ export function privacyScan(strings) {
         const v = m[0].trim();
         if (kind === 'phone number' && v.replace(/\D/g, '').length < 10) continue;
         if (kind === 'phone number' && /^\d{4}-\d{2}-\d{2}/.test(v)) continue; // an ISO date, not a phone
-        hits.push({ kind, value: v, in: text });
+        hits.push({ kind, value: mask(kind, v), in: kind === 'internal address' ? text : '(text withheld)' });
       }
     }
   }
@@ -193,7 +212,8 @@ export function claims(project, { source = null } = {}) {
   const html = readFileSync(project.index, 'utf8');
   const strings = onScreenText(html);
   const privacy = privacyScanProject(project);
-  if (!source) return { source: null, strings, privacy, checked: false };
+  const shown = (list) => list.map((x) => ({ ...x, text: redact(x.text), ...(x.numbers ? { numbers: x.numbers.map((n) => ({ ...n, raw: redact(n.raw) })) } : {}) }));
+  if (!source) return { source: null, strings: shown(strings), privacy, checked: false };
   const root = resolve(source);
   if (!existsSync(root)) throw new Error(`no such source folder: ${root}`);
   const files = indexSource(root);
@@ -213,7 +233,7 @@ export function claims(project, { source = null } = {}) {
     const numbers = numbersIn(s.text).map((raw) => ({ raw, found: file ? file : findNumber(raw) }));
     return { ...s, found: file, numbers };
   });
-  return { source: root, files: files.length, strings: results, privacy, checked: true };
+  return { source: root, files: files.length, strings: shown(results), privacy, checked: true };
 }
 
 export function report(r) {

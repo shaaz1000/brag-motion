@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { openProject } from '../cli/lib/project.js';
-import { claims, onScreenText, numbersIn, privacyScan, indexSource, report } from '../cli/lib/claims.js';
+import { claims, onScreenText, numbersIn, privacyScan, indexSource, report, mask } from '../cli/lib/claims.js';
 
 const FILM = `<!doctype html>
 <html data-composition-variables='[{"id":"title","type":"string","label":"t","default":"Clinic software that remembers"},{"id":"rows","type":"string","label":"r","default":"[[\\"a\\",1]]"},{"id":"accent","type":"color","label":"c","default":"#1765C1"}]'>
@@ -70,9 +70,12 @@ test('claims: each string is looked up in the product; dependencies and secret f
 test('claims: emails, phone numbers and keys on screen are flagged; dates are not phones', () => {
   const hits = privacyScan(onScreenText(FILM));
   const kinds = hits.map((h) => `${h.kind}:${h.value}`);
-  assert.ok(kinds.includes('email address:priya@example.com'));
-  assert.ok(kinds.some((k) => k.startsWith('phone number:+91 98200 41122')));
-  assert.ok(kinds.includes('API key or token:sk-proj-abcdefghijklmnopqrstuvwxyz123456'));
+  assert.ok(kinds.includes('email address:p***@example.com'));
+  assert.ok(kinds.includes(`phone number:${mask('phone number', '+91 98200 41122')}`), kinds.join(' / '));
+  assert.ok(kinds.includes(`API key or token:${mask('API key or token', 'sk-proj-abcdefghijklmnopqrstuvwxyz123456')}`));
+  assert.equal(mask('API key or token', 'sk-proj-abcdefghijklmnopqrstuvwxyz123456'), 'sk-p…56 (40 chars)');
+  assert.equal(mask('phone number', '+91 98200 41122'), '+••••••••••22');
+  assert.ok(!JSON.stringify(hits).includes('abcdefghijklmnop'), 'the secret itself is never repeated');
   assert.deepEqual(privacyScan([{ text: 'Next consultation: 2026-09-15' }]), []);
   assert.deepEqual(privacyScan([{ text: 'Open http://localhost:4000/queue' }]).map((h) => h.kind), ['internal address']);
 });
@@ -82,7 +85,8 @@ test('claims: the report says what is unverified and what is private, and works 
   const text = report(claims(film, { source: src }));
   assert.match(text, /not found/);
   assert.match(text, /✗ Booked\. We will see you on 24 September\./);
-  assert.match(text, /! email address: priya@example\.com/);
+  assert.match(text, /! email address: p\*\*\*@example\.com/);
+  assert.ok(!text.includes('priya@example.com') && !text.includes('sk-proj-abcdefghij'), 'the report never repeats a secret');
   const bare = claims(film);
   assert.equal(bare.checked, false);
   assert.match(report(bare), /add --source/);
@@ -126,9 +130,10 @@ test('claims: privacy covers the whole project — values hidden in JSON variabl
   writeFileSync(join(dir, 'share-copy.txt'), 'Call us at http://192.168.1.20:4000 today');
   const r = claims(openProject(dir));
   const kinds = r.privacy.map((h) => `${h.kind}|${h.value}`);
-  for (const want of ['email address|ana@clinic.example.org', 'API key or token|ghp_abcdefghijklmnopqrstuvwxyz0123456789', 'API key or token|AKIAABCDEFGHIJKLMNOP', 'internal address|http://192.168.1.20:4000'])
+  for (const want of ['email address|a***@clinic.example.org', 'API key or token|ghp_…89 (40 chars)', 'API key or token|AKIA…OP (20 chars)', 'internal address|http://192.168.1.20:4000'])
     assert.ok(kinds.includes(want), `missed ${want}`);
-  assert.ok(kinds.some((k) => k.startsWith('phone number|+91 98200 41122')), 'missed the phone in a data attribute');
+  assert.ok(kinds.includes(`phone number|${mask('phone number', '+91 98200 41122')}`), 'missed the phone in a data attribute: ' + kinds.join(' / '));
+  assert.ok(!JSON.stringify(r.privacy).includes('ghp_abcdefghij'), 'no secret in --json output');
   assert.ok(!kinds.some((k) => k.includes('vendor.example.com')), 'vendor libraries are not the user\'s words');
-  assert.ok(r.privacy.find((h) => h.value === 'ana@clinic.example.org').in.startsWith('index.html:'));
+  assert.ok(r.privacy.find((h) => h.value === 'a***@clinic.example.org').in.startsWith('index.html:'));
 });
