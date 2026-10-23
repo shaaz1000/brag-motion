@@ -114,3 +114,21 @@ test('claims: a SQLite database in the source is evidence (read-only); names and
   assert.deepEqual(line.numbers.find((n) => n.raw === '₹5,400').found, join('data', 'clinic.db') + '#payments');
   assert.ok(indexSource(src).some((f) => f.path === join('data', 'clinic.db') + '#patients' && f.text.includes('chitra silva')));
 });
+
+test('claims: privacy covers the whole project — values hidden in JSON variables, attributes, class positions, long lines and the share copy', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'om-claims-priv-'));
+  const pad = 'x'.repeat(600);
+  writeFileSync(join(dir, 'index.html'), `<!doctype html>
+<html data-composition-variables='[{"id":"rows","type":"string","label":"r","default":"[[\\"Ana\\",\\"ana@clinic.example.org\\"]]"}]'>
+<body><div data-owner="+91 98200 41122"></div>
+<script>el.className = 'ghp_abcdefghijklmnopqrstuvwxyz0123456789'; const s = '${pad}' + 'AKIAABCDEFGHIJKLMNOP';</script></body></html>`);
+  mkdirSync(join(dir, 'vendor')); writeFileSync(join(dir, 'vendor', 'lib.js'), "// author: someone@vendor.example.com");
+  writeFileSync(join(dir, 'share-copy.txt'), 'Call us at http://192.168.1.20:4000 today');
+  const r = claims(openProject(dir));
+  const kinds = r.privacy.map((h) => `${h.kind}|${h.value}`);
+  for (const want of ['email address|ana@clinic.example.org', 'API key or token|ghp_abcdefghijklmnopqrstuvwxyz0123456789', 'API key or token|AKIAABCDEFGHIJKLMNOP', 'internal address|http://192.168.1.20:4000'])
+    assert.ok(kinds.includes(want), `missed ${want}`);
+  assert.ok(kinds.some((k) => k.startsWith('phone number|+91 98200 41122')), 'missed the phone in a data attribute');
+  assert.ok(!kinds.some((k) => k.includes('vendor.example.com')), 'vendor libraries are not the user\'s words');
+  assert.ok(r.privacy.find((h) => h.value === 'ana@clinic.example.org').in.startsWith('index.html:'));
+});

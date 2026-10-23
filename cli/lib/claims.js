@@ -160,10 +160,39 @@ export function privacyScan(strings) {
   return hits;
 }
 
+// Privacy is checked on everything the project holds, not only on what the claims filters keep as
+// on-screen text: a key in a JSON variable, an email in a data attribute or a phone number in the
+// share copy must never slip past because it looked like code. Vendor libraries and render output
+// are skipped (they are not the user's words).
+export function privacyScanProject(project) {
+  const hits = [];
+  const seen = new Set();
+  const walk = (dir) => {
+    let entries; try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const e of entries) {
+      const p = join(dir, e.name), rel = relative(project.root, p);
+      if (e.isDirectory()) { if (!['vendor', 'out', '.om', 'node_modules', '.git', 'stills', 'snapshots'].includes(e.name)) walk(p); continue; }
+      if (!e.isFile() || BINARY_EXT.has(extname(e.name).toLowerCase())) continue;
+      let buf; try { buf = readFileSync(p); } catch { continue; }
+      if (buf.length > 4 << 20 || buf.subarray(0, 1024).includes(0)) continue;
+      buf.toString('utf8').split('\n').forEach((line, i) => {
+        for (const h of privacyScan([{ text: line }])) { // the whole line: a secret past column 400 of a minified line still counts
+          const key = `${h.kind}|${h.value}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          hits.push({ ...h, in: `${rel}:${i + 1}` });
+        }
+      });
+    }
+  };
+  walk(project.root);
+  return hits;
+}
+
 export function claims(project, { source = null } = {}) {
   const html = readFileSync(project.index, 'utf8');
   const strings = onScreenText(html);
-  const privacy = privacyScan(strings);
+  const privacy = privacyScanProject(project);
   if (!source) return { source: null, strings, privacy, checked: false };
   const root = resolve(source);
   if (!existsSync(root)) throw new Error(`no such source folder: ${root}`);
@@ -207,8 +236,8 @@ export function report(r) {
     }
   }
   if (r.privacy.length) {
-    lines.push('', 'Personal data or secrets on screen — a public film must not carry them (use fictional stand-ins):');
+    lines.push('', 'Personal data or secrets in the film'\''s files — a public film must not carry them (use fictional stand-ins):');
     for (const p of r.privacy) lines.push(`  ! ${p.kind}: ${p.value}   in "${p.in}"`);
-  } else lines.push('', 'privacy  no emails, phone numbers, keys or internal addresses on screen');
+  } else lines.push('', 'privacy  no emails, phone numbers, keys or internal addresses anywhere in the film'\''s files');
   return lines.join('\n');
 }
