@@ -1,7 +1,7 @@
 // `om export html`: turn a project into a folder any static host can serve — a clean player page, a
 // playable copy of the film, the om player, and the source as a zip, so whoever watches it can
 // remix it in their own agent. Viewing it makes no network request; the only outside link is REPO_URL.
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync, realpathSync } from 'node:fs';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import zlib from 'node:zlib';
@@ -13,8 +13,11 @@ const SKILL = REPO_URL.replace(/^https:\/\/github\.com\//, '');
 
 // ---------- what ships ----------
 // Tool state and render output stay home: the film copy and the zip carry only what the film needs.
-const SKIP = new Set(['out', '.om', 'snapshots', 'node_modules', '.git', '.DS_Store']);
-export const shipped = (rel) => !rel.split(/[\\/]/).some((seg) => SKIP.has(seg));
+// A share page is public, so private things never ride along: secrets and keys, dotfiles, databases,
+// and the working folders a /brag run keeps its research in (real-app screenshots, data extracts).
+const SKIP = new Set(['out', '.om', 'snapshots', 'node_modules', '.git', '.DS_Store', 'work', 'research', '_material', 'secrets', 'credentials']);
+const PRIVATE = /^(\..*|id_rsa.*|id_ed25519.*|.*\.(pem|key|p12|pfx|keystore|db|sqlite|sqlite3)|service-account.*\.json|credentials.*\.json)$/i;
+export const shipped = (rel) => !rel.split(/[\\/]/).some((seg) => SKIP.has(seg) || PRIVATE.test(seg));
 
 export function sourceFiles(root) {
   const files = [];
@@ -23,6 +26,11 @@ export function sourceFiles(root) {
       const full = join(dir, e.name);
       const rel = relative(root, full).split(sep).join('/');
       if (!shipped(rel)) continue;
+      if (e.isSymbolicLink()) { // a link may point anywhere on the machine: ship it only if it stays inside the project
+        let target; try { target = realpathSync(full); } catch { continue; }
+        const rr = realpathSync(root);
+        if (target !== rr && !target.startsWith(rr + sep)) continue;
+      }
       const st = e.isSymbolicLink() ? statSync(full) : e;
       if (st.isDirectory()) walk(full);
       else if (st.isFile()) files.push(rel);

@@ -164,3 +164,22 @@ for (const example of ['showcase', 'voice-demo']) {
     assert.ok(readFileSync(join(dir, 'film/index.html'), 'utf8').includes('<script src="../player/om-engine.js"></script>'), 'the engine is injected into the film copy');
   });
 }
+
+test('export: secrets, dotfiles, databases, research folders and links out of the project never ship', async () => {
+  const { mkdtempSync, mkdirSync, writeFileSync, symlinkSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { sourceFiles } = await import('../cli/lib/export.js');
+  const root = mkdtempSync(join(tmpdir(), 'om-export-private-'));
+  const outside = mkdtempSync(join(tmpdir(), 'om-export-outside-'));
+  writeFileSync(join(outside, 'id_rsa'), 'PRIVATE KEY');
+  mkdirSync(join(root, 'assets'));
+  writeFileSync(join(root, 'index.html'), '<!doctype html>');
+  writeFileSync(join(root, 'assets', 'logo.svg'), '<svg/>');
+  for (const f of ['.env', '.env.local', 'server.pem', 'service-account-prod.json', 'clinic.db', 'notes.sqlite']) writeFileSync(join(root, f), 'x');
+  for (const d of ['work', 'research', '_material', 'secrets']) { mkdirSync(join(root, d)); writeFileSync(join(root, d, 'screen.png'), 'x'); }
+  mkdirSync(join(root, '.cache')); writeFileSync(join(root, '.cache', 'a'), 'x');
+  symlinkSync(outside, join(root, 'linked-home'));
+  symlinkSync(join(root, 'assets'), join(root, 'assets-link'));
+  assert.deepEqual(sourceFiles(root), ['assets-link/logo.svg', 'assets/logo.svg', 'index.html']);
+});
