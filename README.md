@@ -14,7 +14,7 @@ Your coding agent reads the project you built, plans a launch film in the right 
 let's /brag --length 45
 ```
 
-[Examples](#examples-30-s-45-s-1-minute) · [Install](#install) · [Prompts](PROMPTS.md) · [How it works](#how-it-works) · [Commands](#commands) · [Credits](CREDITS.md)
+[Examples](#examples-30-s-45-s-1-minute) · [Watch the films](#watch-the-films) · [Install](#install) · [Prompts](PROMPTS.md) · [How it works](#how-it-works) · [Commands](#commands) · [Credits](CREDITS.md)
 
 </div>
 
@@ -56,6 +56,33 @@ All three were made with brag-motion, from the apps' own code and demo data. Ful
 `/brag --length 60` · 120 BPM, 30 bars. One demo patient through one clinic day: the 07:45 dashboard, booking online at 07:52, one tap at the front desk, the doctor reading his history before she types, Approve & send, the prescription on WhatsApp — then a 13-cut montage on the beat through the waitlist, team roles and eight practice types — the payment recorded at the desk, the follow-up reminder, and on a key-change drop, the evening heatmap of when the clinic was busiest.
 
 Also on the release page: 20-second **feature films** for Novic (patient history, dashboard and reports, follow-ups, templates, online booking, team roles) in 16:9 and 9:16, and Noor in three directions (one line, five skies, thirty-three beads).
+
+---
+
+## Watch the films
+
+Every film below was made with brag-motion. Click a still to download the full MP4 with sound (they are attached to the [v0.2.0 release](https://github.com/shaaz1000/brag-motion/releases/tag/v0.2.0)).
+
+### Launch films — 30 s, 45 s, 60 s
+
+| | | |
+|---|---|---|
+| <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/noor-A-one-line-16x9.mp4"><img src="docs/media/posters/noor-A-one-line-16x9.jpg" alt="Noor — One line through the day" width="100%" /></a><br/><b>Noor — One line through the day</b><br/><sub>30 s · 120 BPM · iOS app for daily Muslim practice</sub><br/>▶ <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/noor-A-one-line-16x9.mp4">16:9</a> · <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/noor-A-one-line-9x16.mp4">9:16</a> | <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-45s.mp4"><img src="docs/media/posters/novic-45s.jpg" alt="Novic — front desk to follow-up" width="100%" /></a><br/><b>Novic — front desk to follow-up</b><br/><sub>45 s · 112 BPM · clinic software</sub><br/>▶ <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-45s.mp4">16:9</a> | <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-60s.mp4"><img src="docs/media/posters/novic-60s.jpg" alt="Novic — a day at Sunrise Family Clinic" width="100%" /></a><br/><b>Novic — a day at Sunrise Family Clinic</b><br/><sub>60 s · 120 BPM · the whole product</sub><br/>▶ <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-60s.mp4">16:9</a> |
+
+### Novic feature films — 20 s each, 16:9 and 9:16
+
+| | | |
+|---|---|---|
+| <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-patient-history-16x9.mp4"><img src="docs/media/posters/novic-patient-history-16x9.jpg" alt="Patient history" width="100%" /></a><br/><b>Patient history</b><br/><sub>every visit, one search away</sub><br/>▶ <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-patient-history-16x9.mp4">16:9</a> · <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-patient-history-9x16.mp4">9:16</a> | <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-dashboard-reports-16x9.mp4"><img src="docs/media/posters/novic-dashboard-reports-16x9.jpg" alt="Dashboard & reports" width="100%" /></a><br/><b>Dashboard & reports</b><br/><sub>know your practice at a glance</sub><br/>▶ <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-dashboard-reports-16x9.mp4">16:9</a> · <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-dashboard-reports-9x16.mp4">9:16</a> | <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-follow-ups-16x9.mp4"><img src="docs/media/posters/novic-follow-ups-16x9.jpg" alt="Follow-ups" width="100%" /></a><br/><b>Follow-ups</b><br/><sub>nobody slips through the cracks</sub><br/>▶ <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-follow-ups-16x9.mp4">16:9</a> · <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-follow-ups-9x16.mp4">9:16</a> |
+| <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-messages-templates-16x9.mp4"><img src="docs/media/posters/novic-messages-templates-16x9.jpg" alt="Messages & templates" width="100%" /></a><br/><b>Messages & templates</b><br/><sub>built around your practice</sub><br/>▶ <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-messages-templates-16x9.mp4">16:9</a> · <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-messages-templates-9x16.mp4">9:16</a> | <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-online-booking-16x9.mp4"><img src="docs/media/posters/novic-online-booking-16x9.jpg" alt="Online booking" width="100%" /></a><br/><b>Online booking</b><br/><sub>open for booking, even when you're closed</sub><br/>▶ <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-online-booking-16x9.mp4">16:9</a> · <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-online-booking-9x16.mp4">9:16</a> | <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-team-roles-16x9.mp4"><img src="docs/media/posters/novic-team-roles-16x9.jpg" alt="Team & roles" width="100%" /></a><br/><b>Team & roles</b><br/><sub>everyone sees exactly what they need</sub><br/>▶ <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-team-roles-16x9.mp4">16:9</a> · <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/novic-team-roles-9x16.mp4">9:16</a> |
+
+### Noor — three directions for the same brief, 9:16
+
+| | | |
+|---|---|---|
+| <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/noor-A-one-line-9x16.mp4"><img src="docs/media/posters/noor-A-one-line-9x16.jpg" alt="A · One line" width="220" /></a><br/><b>A · One line</b><br/><sub>the app's green line carries it all</sub><br/>▶ <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/noor-A-one-line-9x16.mp4">9:16</a> | <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/noor-B-five-skies-9x16.mp4"><img src="docs/media/posters/noor-B-five-skies-9x16.jpg" alt="B · Five skies" width="220" /></a><br/><b>B · Five skies</b><br/><sub>each prayer over its own sky, on the beat</sub><br/>▶ <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/noor-B-five-skies-9x16.mp4">9:16</a> | <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/noor-C-thirty-three-9x16.mp4"><img src="docs/media/posters/noor-C-thirty-three-9x16.jpg" alt="C · Thirty-three" width="220" /></a><br/><b>C · Thirty-three</b><br/><sub>wooden tasbeeh beads become the film</sub><br/>▶ <a href="https://github.com/shaaz1000/brag-motion/releases/download/v0.2.0/noor-C-thirty-three-9x16.mp4">9:16</a> |
+
+> GitHub only plays videos inline in a README when they are uploaded through its web editor; these link to the release instead.
 
 ---
 
